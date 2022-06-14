@@ -162,7 +162,7 @@ const addEmployee = () => {
             const query = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)`;
             let manager_id = res.manager_id !== 0? res.manager_id: null;
             db.query (query, [[res.first_name, res.last_name, res.role_id, manager_id]], (err, res) => {
-                console.log(`Added ${res.first_name} ${res.last_name} to organization database.`);
+                console.log(`Added new employee to organization database.`);
                 startApp();
             });
          })
