@@ -14,6 +14,7 @@ const db = mysql.createConnection(
     console.log('Connected to the organization_db database.')
 );
 
+// ASCII Art NPM package. Renders text as ASCII art in user's console.
 db.connect( async () => {
     try{
         let rendered = await art.font('Employee Manager', 'doom').completed()
@@ -25,11 +26,14 @@ db.connect( async () => {
     startApp();
 });
 
+// Overarching function
 function startApp() {
+    
+    // List of main menu questions
     const primeQ = [{
         type: 'list',
         message: `What would you like to do?`,
-        choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Update Manager', 'View Emplpoyee by Manager', 'View Budgets', 'Delete Department', 'Delete Role', 'Delete Employee', 'Exit'],
+        choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Update Manager', 'View Emplpoyee by Manager', 'View Budgets', 'Delete Employee', 'Delete Role', 'Delete Department', 'Exit'],
         name:'main'
     }]
 
@@ -82,7 +86,7 @@ function startApp() {
     .catch(err => {console.log(err)});
 };
     
-const viewAll = (table) => {
+const viewAll = (table) => { // Handles menu options that allow user to "View All"
     let query; 
     if (table === 'department') {
         query = `SELECT * FROM department`
@@ -101,6 +105,7 @@ const viewAll = (table) => {
     }
 )};
 
+// Function to create a new employee
 const addEmployee = () => {
     db.query ('SELECT * FROM employee', (err, employeeInfo) => {
         if (err) throw err;
@@ -168,6 +173,7 @@ const addEmployee = () => {
     });
 };
 
+// Function to update an existing employee's data
 const updateEmployee = () => {
     db.query('SELECT * FROM employee', (err, employeeInfo) => {
         if (err) throw err;
@@ -219,6 +225,7 @@ const updateEmployee = () => {
     });
 };
 
+// Function to add a new role
 const addRole = () => {
     
     const deptArr = [];
@@ -262,6 +269,7 @@ const addRole = () => {
     });
 };
 
+// Function to add a new department
 const addDepartment = () => {
     let prompts = [
         {
@@ -284,7 +292,7 @@ const addDepartment = () => {
     });
 };
 
-
+// Function that allows the user to update an existing employee's manager
 const updateManager = () => {
     db.query('SELECT * FROM employee', (err, employeeInfo) => {
         if (err) throw err;
@@ -333,6 +341,7 @@ const updateManager = () => {
     });
 };
 
+// Function that displays a list of a specific manager's employee list. If an employee is not a manager, no data will appear in the console.
 const viewEmployeeByManager = () => {
     db.query ('SELECT * FROM employee', (err, employeeInfo) => {
         if (err) throw err;
@@ -383,6 +392,7 @@ const viewEmployeeByManager = () => {
     });
 };
 
+// Deletes a role ONLY if all employees have been deleted first and roles have been deleted second
 const deleteDepartment = () => {
     const deptArr = [];
     db.query('SELECT * FROM department', (err, res) => {
@@ -418,6 +428,7 @@ const deleteDepartment = () => {
     });
 };
 
+// Deletes a role ONLY if all employees have been deleted first
 const deleteRole = () => {
     db.query('SELECT * FROM role', (err, res) => {
         if (err) throw err;
@@ -454,6 +465,7 @@ const deleteRole = () => {
     })
 };
 
+// Deletes an employee's information from the database
 const deleteEmployee = () => {
     db.query('SELECT * FROM employee', (err, res) => {
         if (err) throw err;
@@ -490,6 +502,7 @@ const deleteEmployee = () => {
     });
 };
 
+// Sums up the total amount of salraies across a department and displays it to the console
 const viewBudgets = () => {
     db.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;

@@ -38,6 +38,8 @@ This application is a command-line application that allows the user to manage a 
 5. Use your keyboard's up, down, and enter keys to navigate the menu and select options respectively.
 6. The requested data will appear in the user's console.
 
+**Important**: Please be aware that in order to use the delete features, to delete a department, all employees within that department need to be deleted first and the roles will need to be deleted second. Similarly, if you want to delete a role, any employee currently assigned to the role will need to be deleted first.
+
 ## How to Contribute
 
 [Contributor Covenant](https://www.contributor-covenant.org/)
