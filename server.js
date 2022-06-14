@@ -1,11 +1,7 @@
-const express = require('express');
 const mysql = require('mysql2');
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-app.use(express.urlencoded({extended: false}));
-app.use(express.json());
+const inquirer = require('inquirer');
+const figlet = require('figlet');
+const cTable = require('console.table');
 
 
 const db = mysql.createConnection(
@@ -17,3 +13,22 @@ const db = mysql.createConnection(
     },
     console.log('Connected to the organization_db database.')
 );
+
+db.connect((err) => {
+    if (err) throw(err);
+    figlet("Employee Manager", function(err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.log(data)
+    });
+    startApp();
+});
+
+async function startApp() {
+    const primeQ = [{
+        
+    }]
+}

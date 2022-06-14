@@ -21,6 +21,7 @@
   "homepage": "https://github.com/falbanese7/falbanese7-Employee-Tracker#readme",
   "dependencies": {
     "console.table": "^0.10.0",
+    "figlet": "^1.5.2",
     "inquirer": "^8.2.4",
     "mysql2": "^2.3.3",
     "nodemon": "^2.0.16"
