@@ -29,7 +29,7 @@ function startApp() {
     const primeQ = [{
         type: 'list',
         message: `What would you like to do?`,
-        choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Update Manager', 'View Emplpoyee by Manager', 'Delete Department', 'Delete Role', 'Delete Employee', 'Exit'],
+        choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Update Manager', 'View Emplpoyee by Manager', 'View Budgets', 'Delete Department', 'Delete Role', 'Delete Employee', 'Exit'],
         name:'main'
     }]
 
@@ -63,6 +63,9 @@ function startApp() {
             case 'View Emplpoyee by Manager': 
                 viewEmployeeByManager();
                 break;
+            case 'View Budgets':
+                viewBudgets();
+                 break;
             case 'Delete Department':
                 deleteDepartment();
                 break;
@@ -84,10 +87,10 @@ const viewAll = (table) => {
     if (table === 'department') {
         query = `SELECT * FROM department`
     } else if (table === 'role') {
-        query = `SELECT R.id AS id, title, salary, D.name AS department FROM role as R LEFT JOIN department AS D ON R.department_id = D.id;`;
+        query = `SELECT r.id AS id, title, salary, d.name AS department FROM role as r LEFT JOIN department AS d ON r.department_id = d.id;`;
     } else {
-        query = `SELECT E.id AS id, E.first_name AS first_name, E.last_name AS last_name, R.title as role, D.name as department, CONCAT(M.first_name, '', M.last_name) AS manager 
-        FROM employee AS E LEFT JOIN ROLE AS R ON E.role_id = R.id LEFT JOIN department as D ON R.department_id = D.id LEFT JOIN employee AS M on E.manager_id = M.id;`;
+        query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
+        FROM employee AS e LEFT JOIN ROLE AS r ON e.role_id = r.id LEFT JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m on e.manager_id = m.id;`;
     }
    
     db.query(query, (err, res) => {
@@ -113,7 +116,7 @@ const addEmployee = () => {
             });
         });
 
-        db.query('SELECT * FROM ROLE', (err, roleInfo) => {
+        db.query('SELECT * FROM role', (err, roleInfo) => {
             if (err) throw err;
             const newRole = [];
             roleInfo.forEach(({ title, id }) => {
@@ -150,7 +153,7 @@ const addEmployee = () => {
         
         inquirer.prompt(prompts)
          .then(res => {
-            const query = `INSERT INTO EMPLOYEE (first_name, last_name, role_id, manager_id) VALUES (?)`;
+            const query = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)`;
             let manager_id = res.manager_id !== 0? res.manager_id: null;
             db.query (query, [[res.first_name, res.last_name, res.role_id, manager_id]], (err, res) => {
                 console.log(`Added ${res.first_name} ${res.last_name} to organization database.`);
@@ -165,20 +168,20 @@ const addEmployee = () => {
 };
 
 const updateEmployee = () => {
-    db.query('SELECT * FROM EMPLOYEE', (err, employeeInfo) => {
+    db.query('SELECT * FROM employee', (err, employeeInfo) => {
         if (err) throw err;
-        const employeeData = [];
+        const employeeArr = [];
         employeeInfo.forEach(({ first_name, last_name, id}) => {
-            employeeData.push( {
+            employeeArr.push( {
                 name: first_name + ' ' + last_name,
                 value: id
             });
         });
-        db.query('SELECT * FROM ROLE', (err, roleInfo) => {
+        db.query('SELECT * FROM role', (err, roleInfo) => {
             if (err) throw err;
-            const updatedRole = [];
+            const roleArr = [];
             roleInfo.forEach(({ title, id }) => {
-                updatedRole.push({
+                roleArr.push({
                     title: title,
                     value: id
                 });
@@ -188,20 +191,20 @@ const updateEmployee = () => {
             {
                 type: 'list',
                 name: 'id',
-                choices: employeeData,
+                choices: employeeArr,
                 message: 'Which employee is being updated?'
             },
             {
                 type: 'list',
                 name: 'role_id',
-                choices: updatedRole,
+                choices: roleArr,
                 message: 'What is the new role of this employee?'
             }
         ]
         
         inquirer.prompt(prompts)
         .then(res => {
-           const query = `UPDATE EMPLOYEE SET ? WHERE ?? = ?;`;
+           const query = `UPDATE employee SET ? WHERE ?? = ?;`;
            db.query (query, [{role_id: res.role_id}, 'id', res.id], (err, res) => {
             if (err) throw err;
                console.log(`Employee has been updated.`);
@@ -214,3 +217,321 @@ const updateEmployee = () => {
         });
     });
 };
+
+const addRole = () => {
+    
+    const deptArr = [];
+    db.query('SELECT * FROM department', (err, res) => {
+        res.forEach(department => {
+            let promptObject = {
+                name: department.name,
+                value: department.id
+            }
+            deptArr.push(promptObject);
+        });
+        let prompts = [
+            {
+                type: 'input',
+                name: 'title',
+                message: 'What is the title of this role?'  
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'What is the salary of this role?' 
+            },
+            {
+                type: 'list',
+                name: 'department',
+                choices: deptArr,
+                message: 'What department is this role a part of?'
+            }
+        ]
+        inquirer.prompt(prompts)
+        .then(res => {
+            const query = `INSERT INTO employee (title, salary, department_id) VALUES (?)`;
+            db.query (query, [[res.title, res.salary, res.department_id]], (err, res) => {
+                console.log(`Added role to organization database.`);
+                startApp();
+            });
+        })
+        .catch(err => {
+           console.log(err);
+        });
+    });
+};
+
+const addDepartment = () => {
+    let prompts = [
+        {
+            type: 'input',
+            name: 'name',
+            message: 'What is the name of this new department?'
+        }
+    ]
+    inquirer.prompt(prompts)
+    .then(res => {
+        const query = `INSERT INTO department (name) VALUES (?)`;
+        db.query (query, [[res.name]], (err, res) => {
+            if (err) throw err;
+            console.log(`Department added to organization database.`);
+            startApp();
+        });
+    })
+    .catch(err => {
+       console.log(err);
+    });
+};
+
+
+const updateManager = () => {
+    db.query('SELECT * FROM employee', (err, employeeInfo) => {
+        if (err) throw err;
+        const employeeArr = [];
+        employeeInfo.forEach(({ first_name, last_name, id}) => {
+            employeeArr.push( { name: first_name + ' ' + last_name, value: id });
+        });
+
+        const managerSelect = [{ name: 'NA', value: 0 }];
+        employeeInfo.forEach(({ first_name, last_name, id}) => {
+            managerSelect.push( {
+                name: first_name + ' ' + last_name,
+                value: id
+            });
+
+        });
+
+        let prompts = [
+            {
+                type: 'list',
+                name: 'id',
+                choices: employeeArr,
+                message: 'Who would you like to update?'
+            },
+            {
+                type: 'list',
+                name: 'manager_id',
+                choices: managerSelect,
+                message: 'Which manager will now be overseeing to this employee?'
+            }
+        ]
+
+        inquirer.prompt(prompts)
+        .then(res => {
+            const query = `UPDATE employee SET ? WHERE ?? = ?;`;
+            let manager_id = res.manager_id !== 0? res.manager_id: null;
+            db.query (query, [{manager_id: res.manager_id}, 'id', res.id], (err, res) => {
+             if (err) throw err;
+                console.log(`Employee has been assigned a new manager.`);
+                startApp();
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    });
+};
+
+const viewEmployeeByManager = () => {
+    db.query ('SELECT * FROM employee', (err, employeeInfo) => {
+        if (err) throw err;
+        const employeeData = [
+            {
+                name: 'NA',
+                value: 0
+            }
+        ];
+        employeeInfo.forEach(({ first_name, last_name, id }) => {
+            employeeData.push({
+                name: first_name + ' ' + last_name,
+                value: id
+            });
+        });
+
+        let prompts = [
+            {
+                type: 'list',
+                name: 'manager_id',
+                choices: employeeData,
+                message: `Which manager's employees would you like to see?`
+            }
+        ]
+
+        inquirer.prompt(prompts)
+        .then(res => {
+            let query, manager_id;
+            if (res.manager_id) {
+                query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
+                FROM employee AS e LEFT JOIN ROLE AS r ON e.role_id = r.id LEFT JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m on e.manager_id = m.id
+                WHERE e.manager_id = ?`;
+                db.query(query, [res.manager_id], (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    startApp();
+                });
+            } else {
+                manager_id = null;
+                query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
+                FROM employee AS e LEFT JOIN ROLE AS r ON e.role_id = r.id LEFT JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m on e.manager_id = m.id
+                WHERE e.manager_id is null`;
+                db.query(query, [res.manager_id], (err, res) => {
+                    if (err) throw err;
+                    startApp();
+                });
+            }
+            // db.query(query, [res.manager_id], (err, res) => {
+            //     if (err) throw err;
+            //     console.table(res);
+            //     startApp();
+            // });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    });
+};
+
+const deleteDepartment = () => {
+    const deptArr = [];
+    db.query('SELECT * FROM department', (err, res) => {
+        res.forEach(department => {
+            let promptObject = {
+                name: department.name,
+                value: department.id
+            }
+            deptArr.push(promptObject);
+        });
+
+        let prompts = [
+            {
+                type: 'list',
+                name: 'id',
+                choices: deptArr,
+                message: 'Which department would you like to delete?'
+            }
+        ]
+
+        inquirer.prompt(prompts)
+        .then(res => {
+            const query = `DELETE FROM department WHERE id = ?`;
+            db.query(query, [res.id], (err, res) => {
+                if (err) throw err;
+                console.log(`The department has been deleted.`)
+                startApp();
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    });
+};
+
+const deleteRole = () => {
+    db.query('SELECT * FROM role', (err, res) => {
+        if (err) throw err;
+
+        const roleArr = [];
+            res.forEach(({ title, id }) => {
+                roleArr.push({
+                    title: title,
+                    value: id
+                });
+            });
+        
+        let prompts = [
+            {
+                type: 'list',
+                name: 'id',
+                choices: roleArr,
+                message: 'Which role would you like to delete?'
+            },
+        ]
+
+        inquirer.prompt(prompts)
+        .then(res => {
+            const query = `DELETE FROM role WHERE id = ?`;
+            db.query(query, [res.id], (err, res) => {
+                if (err) throw err;
+                console.log(`The role has been deleted.`)
+                startApp();
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    })
+};
+
+const deleteEmployee = () => {
+    db.query('SELECT * FROM employee', (err, res) => {
+        if (err) throw err;
+
+        const employeeArr = [];
+        res.forEach(({ first_name, last_name, id }) => {
+            employeeArr.push({
+                name: first_name + ' ' + last_name,
+                value: id
+            });
+        });
+
+        let prompts = [
+            {
+                type: 'list',
+                name: 'id',
+                choices: employeeArr,
+                message: 'Which employee would you like to delete?'
+            }
+        ]
+
+        inquirer.prompt(prompts)
+        .then(res => {
+            const query = `DELETE FROM employee WHERE id = ?`;
+            db.query(query, [res.id], (err, res) => {
+                if (err) throw err;
+                console.log(`Emoloyee has been deleted.`)
+                startApp();
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    });
+};
+
+const viewBudgets = () => {
+    db.query('SELECT * FROM department', (err, res) => {
+        if (err) throw err;
+
+        const dSelect = [];
+        res.forEach(({ name, id }) => {
+            dSelect.push({ name: name, value: id });
+        });
+
+        let prompts = [
+            {
+                type: 'list',
+                name: 'id',
+                choices: dSelect,
+                message: `Which department's budget would you like to view?`
+            }
+        ]
+
+        inquirer.prompt(prompts)
+        .then(res => {
+            const query = `SELECT d.name, SUM(salary) as budget
+            FROM employee AS e LEFT JOIN role AS r ON e.role_id = r.id
+            LEFT JOIN department AS d ON R.department_id = d.id
+            WHERE d.id = ?;`;
+            db.query(query, [res.id], (err, res) => {
+                if (err) throw err;
+                console.table(res);
+                startApp();
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+        
+        
+    })
+}
