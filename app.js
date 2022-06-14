@@ -89,8 +89,9 @@ const viewAll = (table) => {
     } else if (table === 'role') {
         query = `SELECT r.id AS id, title, salary, d.name AS department FROM role as r LEFT JOIN department AS d ON r.department_id = d.id;`;
     } else {
-        query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
-        FROM employee AS e LEFT JOIN ROLE AS r ON e.role_id = r.id LEFT JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m on e.manager_id = m.id;`;
+        query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, r.salary AS salary, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
+        FROM employee AS e LEFT JOIN ROLE AS r ON e.role_id = r.id 
+        LEFT JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m on e.manager_id = m.id;`;
     }
    
     db.query(query, (err, res) => {
@@ -361,29 +362,20 @@ const viewEmployeeByManager = () => {
         .then(res => {
             let query, manager_id;
             if (res.manager_id) {
-                query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
+                query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, r.salary AS salary, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
                 FROM employee AS e LEFT JOIN ROLE AS r ON e.role_id = r.id LEFT JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m on e.manager_id = m.id
                 WHERE e.manager_id = ?`;
-                db.query(query, [res.manager_id], (err, res) => {
-                    if (err) throw err;
-                    console.table(res);
-                    startApp();
-                });
             } else {
                 manager_id = null;
-                query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
+                query = `SELECT e.id AS id, e.first_name AS first_name, e.last_name AS last_name, r.title as role, r.salary AS salary, d.name as department, CONCAT(m.first_name, '', m.last_name) AS manager 
                 FROM employee AS e LEFT JOIN ROLE AS r ON e.role_id = r.id LEFT JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m on e.manager_id = m.id
                 WHERE e.manager_id is null`;
-                db.query(query, [res.manager_id], (err, res) => {
-                    if (err) throw err;
-                    startApp();
-                });
             }
-            // db.query(query, [res.manager_id], (err, res) => {
-            //     if (err) throw err;
-            //     console.table(res);
-            //     startApp();
-            // });
+            db.query(query, [res.manager_id], (err, res) => {
+                if (err) throw err;
+                console.table(res);
+                startApp();
+            });
         })
         .catch(err => {
             console.log(err);
