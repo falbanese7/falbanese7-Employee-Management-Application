@@ -31,6 +31,8 @@ This application is a command-line application that allows the user to manage a 
 
 ## Usage
 
+[The Video Walkthrough can be found by clicking on this hyperlinked text.](https://drive.google.com/file/d/16Dysy594dM-yca0Dd17ZAYirQt0LBSkE/view?usp=sharing)
+
 1. Open the repository in a code edting application like Visual Studio Code
 2. Open the root directory of the repository
 3. Open an integrated terminal
