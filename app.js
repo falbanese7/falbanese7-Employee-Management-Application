@@ -39,7 +39,7 @@ function startApp() {
     .then(response => {
         switch (response.main){
             case 'View All Employees':
-                viewAll('Employees');
+                viewAll('employee');
                 break;
             case 'Add Employee':
                 addNewEmployee();
@@ -48,13 +48,13 @@ function startApp() {
                 updateEmployee();
                 break;
             case 'View All Roles':
-                viewAll('Roles');
+                viewAll('role');
                 break;
             case 'Add Role':
                 addRole();
                 break;
             case 'View All Departments':
-                viewAll('Departments');
+                viewAll('department');
                 break;
             case 'Add Department':
                 addDepartment();
@@ -81,3 +81,20 @@ function startApp() {
     .catch(err => {console.log(err)});
 };
     
+const viewAll = (table) => {
+    let query; 
+    if (table === 'department') {
+        query = `SELECT * FROM department`
+    } else if (table === 'role') {
+        query = `SELECT R.id AS id, title, salary, D.name AS department FROM role as R LEFT JOIN department AS D ON R.department_id = D.id;`;
+    } else {
+        query = `SELECT E.id AS id, E.first_name AS first_name, E.last_name AS last_name, R.title as role, D.name as department, CONCAT(M.first_name, '', M.last_name) AS manager 
+        FROM employee AS E LEFT JOIN ROLE AS R ON E.role_id = R.id LEFT JOIN department as D ON R.department_id = D.id LEFT JOIN employee AS M on E.manager_id = M.id;`;
+    }
+   
+    db.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        startApp();
+    }
+)};
