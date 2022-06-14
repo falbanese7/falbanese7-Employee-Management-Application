@@ -6,8 +6,6 @@ VALUES ("Management"),
        ("Customer Service"),
        ("Finance");
 
-SELECT * FROM department;
-
 INSERT INTO role (title, salary, department_id)
 VALUES  ("CEO", 250000, 1),
         ("Sales Lead", 150000, 2),
@@ -19,17 +17,13 @@ VALUES  ("CEO", 250000, 1),
         ("Customer Service Rep", 80000, 5),
         ("VP of Finance", 200000, 6);
 
-SELECT * FROM role;
-
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Richard", "Hendricks", 1, NULL),
-       ("Rick", "Sanchez", 2, 1),
-       ("Morty", "Smith", 3, 2),
-       ("Kermit", "The Frog", 4, 1),
-       ("Fozzy", "Bear", 5, 4),
-       ("Miss", "Piggy", 6, 1),
-       ("Annie", "Edison", 7, 1),
-       ("Brita", "Perry", 8, 7),
-       ("Monica", "Hall", 9, 1);
-
-SELECT * FROM employee;
+VALUES ("Richard", " Hendricks", 1, NULL),
+       ("Rick", " Sanchez", 2, 1),
+       ("Morty", " Smith", 3, 2),
+       ("Kermit", " The Frog", 4, 1),
+       ("Fozzy", " Bear", 5, 4),
+       ("Miss", " Piggy", 6, 1),
+       ("Annie", " Edison", 7, 1),
+       ("Brita", " Perry", 8, 7),
+       ("Monica", " Hall", 9, 1);
