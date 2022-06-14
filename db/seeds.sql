@@ -26,4 +26,4 @@ VALUES ("Richard", " Hendricks", 1, NULL),
        ("Miss", " Piggy", 6, 1),
        ("Annie", " Edison", 7, 1),
        ("Brita", " Perry", 8, 7),
-       ("Monica", " Hall", 9, 1);
+       ("Monica", "Hall", 9, 1);

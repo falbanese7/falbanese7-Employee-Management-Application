@@ -165,10 +165,10 @@ const addEmployee = () => {
 };
 
 const updateEmployee = () => {
-    db.query('SELECT * FROM employee', (err, employeeInfo) => {
+    db.query('SELECT * FROM EMPLOYEE', (err, employeeInfo) => {
         if (err) throw err;
         const employeeData = [];
-        employeeInfo.forEach(({ name, value}) => {
+        employeeInfo.forEach(({ first_name, last_name, id}) => {
             employeeData.push( {
                 name: first_name + ' ' + last_name,
                 value: id
@@ -201,7 +201,7 @@ const updateEmployee = () => {
         
         inquirer.prompt(prompts)
         .then(res => {
-           const query = `UPDATE employee SET ? WHERE ?? = ?;)`;
+           const query = `UPDATE EMPLOYEE SET ? WHERE ?? = ?;`;
            db.query (query, [{role_id: res.role_id}, 'id', res.id], (err, res) => {
             if (err) throw err;
                console.log(`Employee has been updated.`);
