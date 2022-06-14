@@ -33,7 +33,7 @@ function startApp() {
     const primeQ = [{
         type: 'list',
         message: `What would you like to do?`,
-        choices: ['View All Employees', 'Add Employee', 'Update Employee Role', 'View All Roles', 'Add Role', 'View All Departments', 'Add Department', 'Update Manager', 'View Emplpoyee by Manager', 'View Budgets', 'Delete Employee', 'Delete Role', 'Delete Department', 'Exit'],
+        choices: ['View All Employees', 'View All Roles', 'View All Departments', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Update Manager', 'View Emplpoyee by Manager', 'View Budgets', 'Delete Employee', 'Delete Role', 'Delete Department', 'Exit'],
         name:'main'
     }]
 
@@ -230,10 +230,11 @@ const addRole = () => {
     
     const deptArr = [];
     db.query('SELECT * FROM department', (err, res) => {
-        res.forEach(department => {
+        if (err) throw err;
+        res.forEach(depart => {
             let promptObject = {
-                name: department.name,
-                value: department.id
+                name: depart.name,
+                value: depart.id
             }
             deptArr.push(promptObject);
         });
@@ -250,14 +251,14 @@ const addRole = () => {
             },
             {
                 type: 'list',
-                name: 'department',
+                name: 'department_id',
                 choices: deptArr,
                 message: 'What department is this role a part of?'
             }
         ]
         inquirer.prompt(prompts)
         .then(res => {
-            const query = `INSERT INTO employee (title, salary, department_id) VALUES (?)`;
+            const query = `INSERT INTO role (title, salary, department_id) VALUES (?)`;
             db.query (query, [[res.title, res.salary, res.department_id]], (err, res) => {
                 console.log(`Added role to organization database.`);
                 startApp();
