@@ -8,6 +8,8 @@
 
 This application is a command-line application that allows the user to manage a database of their employee information. The information includes data such as employee first & last names, role name, department names, salaries and managers. The user can also update and delete speciifc employee information.
 
+![Application Main Menu](./images/Screen%20Shot%202022-06-14%20at%203.47.54%20PM.png)
+
 ## Table of Contents
 
 - [Installation](#installation)
